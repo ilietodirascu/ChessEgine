@@ -1,30 +1,24 @@
 ﻿using ChessEngine.BoardRepresentation;
 using ChessEngine.Enums;
+using ChessEngine.Extensions;
 using ChessEngine.Game;
 using ChessEngine.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace ChessEngine.AI
 {
     public class Bot
     {
-        public Color Color { get; set; }
+        public Color Color { get; init; }
         private GameState _state;
-        
+
+        public Bot(Color color)
+        {
+            Color = color;
+        }
         public void SetBoardAsWhite()
         {
-            Color = Color.White;
             var board = new Board();
-            _state = new(board);
-        }
-        public void SetBoardAsBlack(string position)
-        {
-            Color = Color.Black;
-            var board = new Board(position);
             _state = new(board);
         }
         public string GetMove()
@@ -34,6 +28,31 @@ namespace ChessEngine.AI
             var move = legalMoves[randomIndex];
             move.MakeMove(_state);
             return move.Notation;
+        }
+        public void UpdateBoard(string moveNotation)
+        {
+            InitializeState();
+            var opposingColor = Color == Color.White ? Color.Black : Color.White;
+            _state.MakeMoveByNotation(moveNotation, opposingColor);
+        }
+        public void UpdateBoardFromFen(string position)
+        {
+            InitializeState();
+            var board = new Board(position);
+            var copyMoveHistory = new List<Move>(_state.MoveHistory);
+            _state = new(board)
+            {
+                MoveHistory = copyMoveHistory
+            };
+
+        }
+        private void InitializeState()
+        {
+            if(_state == null )
+            {
+                var board = new Board();
+                _state = new(board);
+            }
         }
     }
 }

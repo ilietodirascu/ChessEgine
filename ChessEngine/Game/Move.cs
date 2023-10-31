@@ -42,6 +42,14 @@ namespace ChessEngine.Game
             stateEndSquare.Piece = PieceFactory.CreatePiece(EndSquarePiece.Value,EndSquarePiece.Color,stateEndSquare);
             stateEndSquare.Piece!.CurrentLocation = stateEndSquare;
             this.AddMoveNotation(IsPromotion);
+            if(stateEndSquare.Piece is King king && !king.HasMoved)
+            {
+                king.HasMoved = true;
+            }
+            else if(stateEndSquare.Piece is Rook rook && !rook.HasMoved)
+            {
+                rook.HasMoved = true;
+            }
             state.MoveHistory.Add(this);
         }
         public void CastleSideEffect()
@@ -52,17 +60,19 @@ namespace ChessEngine.Game
             {
                 var queenSideRookSquare = squares[0, StartSquare.Rank];
                 var queenSideRook = queenSideRookSquare.Piece;
-                queenSideRookSquare.Piece = null;
                 var newRookSquare = squares[StartSquare.File - 1, StartSquare.Rank];
-                newRookSquare.Piece = queenSideRook;
+                newRookSquare.Piece = PieceFactory.CreatePiece(queenSideRook!.Value, queenSideRook!.Color, newRookSquare);
+                if (newRookSquare.Piece is Rook rook) rook.HasMoved = true;
+                queenSideRookSquare.Piece = null;
             }
             else
             {
                 var kingSideRookSquare = squares[7, StartSquare.Rank];
-                var kingSideRook = kingSideRookSquare.Piece;
-                kingSideRookSquare.Piece = null;
+                var kingSideRookPiece = kingSideRookSquare.Piece;
                 var newRookSquare = squares[StartSquare.File + 1, StartSquare.Rank];
-                newRookSquare.Piece = kingSideRook;
+                newRookSquare.Piece = PieceFactory.CreatePiece(kingSideRookPiece!.Value,kingSideRookPiece!.Color,newRookSquare);
+                if(newRookSquare.Piece is Rook rook) rook.HasMoved = true;
+                kingSideRookSquare.Piece = null;
             }
         }
         public void EnPassantSideEffect()

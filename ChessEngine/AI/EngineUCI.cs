@@ -1,51 +1,53 @@
-﻿using ChessEngine.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ChessEngine.Enums;
+using ChessEngine.Game;
+using ChessEngine.Utility;
+using System.Security.Cryptography;
 
 namespace ChessEngine.AI
 {
     public class EngineUCI
     {
-        private readonly Bot _player;
+        private Bot _player;
         public EngineUCI()
         {
-            _player = new Bot();
         }
         public void ReceiveCommand(string message)
         {
             //Console.WriteLine(message);
-            message = message.Trim();
-            string messageType = message.Split(' ')[0].ToLower();
-
-            switch (messageType)
+            try
             {
-                case "uci":
-                    Respond("uciok");
-                    break;
-                case "isready":
-                    Respond("readyok");
-                    break;
-                case "ucinewgame":
-                    break;
-                case "position":
-                    ProcessPositionCommand(message);
-                    break;
-                case "go":
-                    ProcessGoCommand(message);
-                    break;
-                case "stop":
-                    break;
-                case "quit":
-                    break;
-                case "d":
-                    break;
-                default:
-                    break;
+                message = message.Trim();
+                string messageType = message.Split(' ')[0].ToLower();
+
+                switch (messageType)
+                {
+                    case "uci":
+                        Respond("uciok");
+                        break;
+                    case "isready":
+                        Respond("readyok");
+                        break;
+                    case "ucinewgame":
+                        break;
+                    case "position":
+                        ProcessPositionCommand(message);
+                        break;
+                    case "go":
+                        ProcessGoCommand();
+                        break;
+                    case "stop":
+                        break;
+                    case "quit":
+                        break;
+                    case "d":
+                        break;
+                    default:
+                        break;
+                }
+            }catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString() + $"Player is null ?????:{_player is null} \n {message}");
+                //Console.WriteLine(_player.Color);
             }
         }
         void Respond(string reponse)
@@ -54,23 +56,22 @@ namespace ChessEngine.AI
         }
         void ProcessPositionCommand(string message)
         {
-            if (message.ToLower().Contains("startpos"))
+            var words = message.Split(' ');
+            if (words.Length == 2 && words[1] == "startpos")
             {
+                _player = new Bot(Color.White);
                 _player.SetBoardAsWhite();
+                return;
             }
-            else if (message.ToLower().Contains("fen"))
+            else if (words.Length == 4 && words[2] == "moves" && _player is null)
             {
-                string piecePlacement = FenNotation.GetNotation(message).PiecePlacement;
-                _player.SetBoardAsBlack(piecePlacement);
+                _player = new Bot(Color.Black);
             }
-            else
-            {
-                Console.WriteLine("Invalid position command (expected 'startpos' or 'fen')");
-            }
+            _player.UpdateBoard(words[^1]);
         }
-        void ProcessGoCommand(string message)
+        void ProcessGoCommand()
         {
-            Respond(_player.GetMove());
+            Respond($"bestmove {_player.GetMove()}");
         }
     }
 }

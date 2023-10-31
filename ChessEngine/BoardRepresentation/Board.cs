@@ -22,6 +22,10 @@ namespace ChessEngine.BoardRepresentation
         {
             InitializeBoardFromFen(fen);
         }
+        public Piece? GetPiece(ushort file, ushort rank)
+        {
+            return Squares[file, rank].Piece;
+        }
         private void InitializeBoardFromFen(string fen)
         {
             var ranksPieces = fen.Split('/');

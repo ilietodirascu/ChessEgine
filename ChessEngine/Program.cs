@@ -6,5 +6,5 @@ string command = String.Empty;
 while (command != "quit")
 {
     command = Console.ReadLine();
-    //engine.ReceiveCommand(command);
+    engine.ReceiveCommand(command);
 }

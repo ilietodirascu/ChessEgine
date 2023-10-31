@@ -90,7 +90,8 @@ namespace ChessEngine.Pieces
             var lastMovePiece = lastMove.EndSquarePiece;
             var isPawn = lastMovePiece is Pawn;
             var pawnMovedTwoSquares = Math.Abs(lastMove.EndSquare.Rank - lastMove.StartSquare.Rank) == 2;
-            var pawnIsAdjacent = lastMove.EndSquare.File == CurrentLocation.File && lastMove.EndSquare.Rank == CurrentLocation.Rank;
+            var fileAdjacency = new int[] { CurrentLocation.File + 1, CurrentLocation.File - 1 };
+            var pawnIsAdjacent = fileAdjacency.Contains(lastMove.EndSquare.File) && lastMove.EndSquare.Rank == CurrentLocation.Rank;
             var pawnIsOppositeColor = lastMovePiece.Color != Color; //you never know
             if (isPawn && pawnMovedTwoSquares && pawnMovedTwoSquares && pawnIsAdjacent && pawnIsOppositeColor) return true;
             return false;

@@ -1,4 +1,6 @@
-﻿using ChessEngine.Enums;
+﻿using ChessEngine.BoardRepresentation;
+using ChessEngine.Enums;
+using ChessEngine.Extensions;
 using ChessEngine.Game;
 using ChessEngine.Pieces;
 using System;
@@ -14,10 +16,11 @@ namespace ChessEngine.Utility
     {
         private static string _blackPieces = "rnbqkp";
         private static string _witePieces = "RNBQKP";
-        private static string _files = "abcdefgh";
+        public static string Files = "abcdefgh";
         public static readonly string StartPosFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
         public static FenNotationResponse? GetNotation(string fenString)
         {
+            fenString =fenString.Trim();
             string pattern = @"^(?# Piece Placement Section)(?<PiecePlacement>((?<RankItem>[pnbrqkPNBRQK1-8]{1,8})\/?){8})(?# Section Separator)\s+(?# Side To Move Section)(?<SideToMove>b|w)(?# Section Separator)\s+(?# Castling Ability)(?<Castling>-|K?Q?k?q)(?# Section Separator)\s+(?# En passant)(?<EnPassant>-|[a-h][3-6])(?# Section Separator)\s+(?# Half Move Clock)(?<HalfMoveClock>\d+)(?# Section Separator)\s+(?# Full Move Number)(?<FullMoveNumber>\d+)\s*$";
             Match match = Regex.Match(fenString, pattern);
 
@@ -39,9 +42,10 @@ namespace ChessEngine.Utility
         {
             var startSquare = move.StartSquare;
             var endSquare = move.EndSquare;
-            var result = $"{_files[startSquare.File]}{startSquare.Rank + 1}{_files[endSquare.File]}{endSquare.Rank + 1}";
-            move.Notation = isPromotion ? result + endSquare.Piece!.ToString() : result;
+            var result = $"{Files[startSquare.File]}{startSquare.Rank + 1}{Files[endSquare.File]}{endSquare.Rank + 1}";
+            move.Notation = isPromotion ? result + move.EndSquarePiece!.ToString()!.ToLower() : result;
         }
+        
         public static (PieceValue,Color) GetPieceByChar(char pieceNotation)
         {
             var color = _witePieces.Contains(pieceNotation) ? Color.White : Color.Black;
