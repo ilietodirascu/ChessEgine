@@ -23,16 +23,18 @@ namespace ChessEngine.AI
             var board = new Board();
             _state = new(board);
         }
-        public void SetBoardGivenFen(string fen) 
+        public void SetBoardGivenFen(string fen)
         {
             var board = new Board(fen);
             _state = new(board);
         }
         public Move Search()
         {
-            return FindBestMove(3); ;
+            var legalMoves = _state.GetLegalMoves(Color);
+            return GetBestMove(legalMoves, _state);
+           
         }
-       
+
         private GameState GetGameStateCopy()
         {
             var tempBoard = _state.Board.Clone() as Board ?? throw new Exception("Something Wrong with cloning board");
@@ -104,6 +106,14 @@ namespace ChessEngine.AI
                 });
                 return bestValue;
             }
+        }
+        private int TestMove(Move move)
+        {
+            var state = GetGameStateCopy();
+            var opposingLegalMoves = state.GetLegalMoves(Color.GetOpposingColor());
+            var bestOpposingMove = GetBestMove(opposingLegalMoves, state);
+            bestOpposingMove.MakeMove(state);
+            return state.GetSumOfMaterial(Color.GetOpposingColor());
         }
         private Move GetBestMove(List<Move> moves, GameState initialState)
         {

@@ -25,7 +25,7 @@ namespace ChessEngine.Game
             IsEnpassant = isEnpassant;
             IsCastle = isCastle;
             IsPromotion = isPromotion;
-            Value = StartSquare.Piece is King ? 1 : (double)EndSquarePiece.Value;
+            Value = 0;
         }
         public void MakeMove(GameState state)
         {
