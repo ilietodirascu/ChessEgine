@@ -140,6 +140,14 @@ namespace ChessTests
             var legalMoves = state.GetLegalMoves(Color.White);
             TestLegalMoves(legalMoves, state);
         }
+        [Fact]
+        public static void CheckFailingGame5()
+        {
+            var board = new Board("rn2kbnr/pp4pp/8/1Bp2Q2/8/8/PPP2PPP/RNB1K2R");
+            var state = new GameState(board);
+            var legalMoves = state.GetLegalMoves(Color.Black);
+            Assert.Empty(legalMoves.Where(x => x.Notation == "b7b5").ToList());
+        }
         private void TestLegalMoves(List<Move> moves,GameState initialState )
         {
             var board = initialState.Board;
@@ -216,7 +224,7 @@ namespace ChessTests
             var kingMoves = new List<Move>();
             var queenMoves = new List<Move>();
             var gameState = new GameState(board);
-            var pieces = board.GetPiecesFromBoard(state);
+            var pieces = board.GetAllPieces(state);
             var rooks = pieces.Where(x => x is Rook).ToList();
             var pawns = pieces.Where(x => x is Pawn).ToList();
             var knights = pieces.Where(x => x is Knight).ToList();

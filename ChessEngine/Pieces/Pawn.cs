@@ -77,11 +77,11 @@ namespace ChessEngine.Pieces
             else
             {
                 _moves.Add(new Move(CurrentLocation, nextSquare));
-                if((Color == Color.White && CurrentLocation.Rank == 1) || (Color == Color.Black && CurrentLocation.Rank == 6))
-                {
-                    var nextNextSquare = board.Squares[CurrentLocation.File, nextRank + direction];
-                    _moves.Add(new Move(CurrentLocation, nextNextSquare));
-                }
+                if ((Color == Color.White && CurrentLocation.Rank != 1) || (Color == Color.Black && CurrentLocation.Rank != 6)) return;
+                
+                 var nextNextSquare = board.Squares[CurrentLocation.File, nextRank + direction];
+                if (nextNextSquare.Piece != null) return;
+                 _moves.Add(new Move(CurrentLocation, nextNextSquare));
             }
         }
         private bool CanEnpassant(Move? lastMove)

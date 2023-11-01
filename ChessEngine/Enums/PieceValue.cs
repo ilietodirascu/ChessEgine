@@ -14,6 +14,6 @@ namespace ChessEngine.Enums
         Knight = 3,
         Rook = 5,
         Queen = 9,
-        King = int.MaxValue
+        King = 10000
     }
 }

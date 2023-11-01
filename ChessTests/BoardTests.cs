@@ -23,7 +23,7 @@ namespace ChessTests
             var fen = board.GetFenOfBoardState();
             Assert.Equal(FenNotation.StartPosFen, fen);
             var state = new GameState(board);
-            var pawn = board.GetPiecesFromBoard(state).First(x => x is Pawn && x.Color == Color.White && x.CurrentLocation.File == 4);
+            var pawn = board.GetAllPieces(state).First(x => x is Pawn && x.Color == Color.White && x.CurrentLocation.File == 4);
             var gameState = new GameState(board);
             pawn.GetMoves(gameState).First(x => x.EndSquare.File == 4 && x.EndSquare.Rank == 3).MakeMove(gameState);
             var updatedFen = board.GetFenOfBoardState();

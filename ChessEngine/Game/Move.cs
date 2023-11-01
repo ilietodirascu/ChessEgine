@@ -8,6 +8,7 @@ namespace ChessEngine.Game
     public class Move
     {
         private Board _board;
+        public double Value { get; set; }
         public Square StartSquare { get; set; }
         public Square EndSquare { get; set; }
         public Piece EndSquarePiece { get; set; }
@@ -24,6 +25,7 @@ namespace ChessEngine.Game
             IsEnpassant = isEnpassant;
             IsCastle = isCastle;
             IsPromotion = isPromotion;
+            Value = StartSquare.Piece is King ? 1 : (double)EndSquarePiece.Value;
         }
         public void MakeMove(GameState state)
         {

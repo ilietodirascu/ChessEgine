@@ -1,6 +1,9 @@
 ﻿using ChessEngine.Enums;
+using ChessEngine.Extensions;
 using ChessEngine.Game;
 using ChessEngine.Utility;
+using System.Net;
+using System.Numerics;
 using System.Security.Cryptography;
 
 namespace ChessEngine.AI
@@ -8,8 +11,11 @@ namespace ChessEngine.AI
     public class EngineUCI
     {
         private Bot _player;
+        static readonly string[] positionLabels = new[] { "position", "fen", "moves" };
+
         public EngineUCI()
         {
+            _player = new(Color.White);
         }
         public void ReceiveCommand(string message)
         {
@@ -56,22 +62,58 @@ namespace ChessEngine.AI
         }
         void ProcessPositionCommand(string message)
         {
-            var words = message.Split(' ');
-            if (words.Length == 2 && words[1] == "startpos")
+            if (message.ToLower().Contains("startpos"))
             {
-                _player = new Bot(Color.White);
                 _player.SetBoardAsWhite();
-                return;
             }
-            else if (words.Length == 4 && words[2] == "moves" && _player is null)
+            else if (message.ToLower().Contains("fen"))
             {
-                _player = new Bot(Color.Black);
+                string customFen = TryGetLabelledValue(message, "fen", positionLabels);
+                var fenNotation = FenNotation.GetNotation(customFen);
+                _player.SetBoardGivenFen(fenNotation.PiecePlacement);
             }
-            _player.UpdateBoard(words[^1]);
+            string allMoves = TryGetLabelledValue(message, "moves", positionLabels);
+            if (!string.IsNullOrEmpty(allMoves))
+            {
+                var counter = 0;
+                var color = _player.Color;
+                string[] moveList = allMoves.Split(' ');
+                foreach (string move in moveList)
+                {
+                    color = counter % 2 == 0 ? Color.White : Color.Black;
+                    _player._state.MakeMove(move, color);
+                    counter++;
+                }
+                _player.Color = color.GetOpposingColor();
+            }
         }
         void ProcessGoCommand()
         {
             Respond($"bestmove {_player.GetMove()}");
         }
+        static string TryGetLabelledValue(string text, string label, string[] allLabels, string defaultValue = "")
+        {
+            text = text.Trim();
+            if (text.Contains(label))
+            {
+                int valueStart = text.IndexOf(label) + label.Length;
+                int valueEnd = text.Length;
+                foreach (string otherID in allLabels)
+                {
+                    if (otherID != label && text.Contains(otherID))
+                    {
+                        int otherIDStartIndex = text.IndexOf(otherID);
+                        if (otherIDStartIndex > valueStart && otherIDStartIndex < valueEnd)
+                        {
+                            valueEnd = otherIDStartIndex;
+                        }
+                    }
+                }
+
+                return text.Substring(valueStart, valueEnd - valueStart).Trim();
+            }
+            return defaultValue;
+        }
+
     }
 }

@@ -24,11 +24,18 @@ namespace ChessEngine.Game
             var requestedMove = legalMoves.Where(x => x.Notation ==  notation).SingleOrDefault() ?? throw new Exception("No Such Move");
             requestedMove.MakeMove(this);
         }
+        public int GetSumOfMaterial(Color color) 
+        {
+            var totalValue = 0;
+            var piecesOfColor = Board.GetPiecesOfColor(this,color);
+            piecesOfColor.ForEach(x => totalValue += (int)x.Value);
+            return totalValue;
+        }
         public bool VerifyIsCheckForColor(Color checkedColor)
         {
             var opposingColor = Color.White == checkedColor ? Color.Black : Color.White;
             var movesForOppositeColor = Board.GetPseudoLegalMoves(opposingColor, this);
-            var kingOfCheckedColor = Board.GetPiecesFromBoard(this).First(p => p is King && p.Color == checkedColor);
+            var kingOfCheckedColor = Board.GetAllPieces(this).First(p => p is King && p.Color == checkedColor);
             var movesThatResultInKingCapture = movesForOppositeColor.Where(x => x.EndSquare.SquareEquals(kingOfCheckedColor.CurrentLocation)).ToList();
             return movesThatResultInKingCapture.Any();
         }
@@ -47,7 +54,7 @@ namespace ChessEngine.Game
         {
             var board = Board;
             var legalMoves = new List<Move>();
-            var pieces = board.GetPiecesFromBoard(this).Where(x => x.Color == color).ToList();
+            var pieces = board.GetAllPieces(this).Where(x => x.Color == color).ToList();
             var initialGameState = new GameState(board)
             {
                 MoveHistory = new List<Move>(MoveHistory)

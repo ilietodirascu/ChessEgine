@@ -111,19 +111,29 @@ namespace ChessEngine.BoardRepresentation
             var pseudoLegalMoves = new List<Move>();
             var squares = state.Board.Squares;
 
-            GetPiecesFromBoard(state)
+            GetAllPieces(state)
                 .Where(x => x.Color == color)
                 .ToList()
                 .ForEach(x => pseudoLegalMoves.AddRange(x.GetMoves(state)));
             return pseudoLegalMoves;
         }
-        public List<Piece> GetPiecesFromBoard(GameState state)
+        public List<Piece> GetAllPieces(GameState state)
         {
             var squares = state.Board.Squares;
             var listOfPieces = new List<Piece>();
             foreach (var square in squares)
             {
                 if(square.Piece != null) listOfPieces.Add(square.Piece);
+            }
+            return listOfPieces;
+        }
+        public List<Piece> GetPiecesOfColor(GameState state, Color color)
+        {
+            var squares = state.Board.Squares;
+            var listOfPieces = new List<Piece>();
+            foreach (var square in squares)
+            {
+                if (square.Piece != null && square.Piece.Color ==  color) listOfPieces.Add(square.Piece);
             }
             return listOfPieces;
         }
